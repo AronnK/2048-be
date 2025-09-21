@@ -144,7 +144,7 @@ class PlayerAgent:
 app = Flask(__name__)
 CORS(app)
 
-MODEL_PATH = r"D:\2048\2048_best_new.pth"
+MODEL_PATH = "2048_best_new.pth"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 try:
