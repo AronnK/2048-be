@@ -148,7 +148,7 @@ MODEL_PATH = "2048_best_new.pth"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 try:
-    agent = PlayerAgent(model_path=MODEL_PATH, device=device, depth=3)
+    agent = PlayerAgent(model_path=MODEL_PATH, device=device, depth=2)
     print("Agent initialized successfully!")
 except Exception as e:
     print(f"FATAL: Error initializing agent: {e}")
