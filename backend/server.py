@@ -37,14 +37,15 @@ class CNN_DuelingDQN(nn.Module):
         return q_values
 
 class PlayerAgent:
-    def __init__(self, model_path, device, depth=2):
+    def __init__(self, model_path, device, depth=3):
         self.device = device
         self.depth = depth
         print(f"Loading model from: {model_path}")
         self.model = CNN_DuelingDQN(in_channels=1, action_dim=4).to(self.device)
         
         if os.path.exists(model_path):
-            self.model.load_state_dict(torch.load(model_path, map_location=self.device))
+            checkpoint = torch.load(model_path, map_location=self.device)
+            self.model.load_state_dict(checkpoint['q_net'])
             self.model.eval()
             print("Model loaded successfully!")
         else:
@@ -139,12 +140,12 @@ class PlayerAgent:
                 
             return expected_score / len(empty_cells), None
 
-app = Flask(__name__)
 
+app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-MODEL_PATH = "2048_best_new.pth" 
-device = torch.device("cpu")
+MODEL_PATH = "2048_best_new.pth"
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 try:
     agent = PlayerAgent(model_path=MODEL_PATH, device=device, depth=2)
@@ -155,6 +156,7 @@ except Exception as e:
 
 @app.route('/get-move-ai', methods=['POST'])
 def get_move_ai():
+    """Endpoint for getting a move from the AI without ExpectiMax."""
     if agent is None:
         return jsonify({'error': 'Agent not initialized'}), 500
     try:
@@ -166,6 +168,7 @@ def get_move_ai():
         
 @app.route('/get-move-ai-alg', methods=['POST'])
 def get_move_ai_alg():
+    """Endpoint for getting a move from the AI with ExpectiMax search."""
     if agent is None:
         return jsonify({'error': 'Agent not initialized'}), 500
     try:
@@ -176,6 +179,5 @@ def get_move_ai_alg():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    print("Server starting...")
-    app.run(debug=False)
-
+    print("Server starting on http://localhost:5000")
+    app.run(host='0.0.0.0', port=5000, debug=False)
