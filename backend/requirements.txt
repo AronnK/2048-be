@@ -1,5 +1,0 @@
-numpy
-flask
-flask-cors
-gunicorn
-torch --index-url https://download.pytorch.org/whl/cpu
